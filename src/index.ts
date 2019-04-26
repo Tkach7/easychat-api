@@ -44,7 +44,7 @@ db.connect()
       console.info(`Server started on ${port}`);
       console.info(`Open http://localhost:${port}/`);
 
-      io.origins(['http://localhost:63342']);
+      io.origins(['http://localhost:63342']); // cors
       io.on(EventTypes.Connection, connection(conn));
     });
   })
