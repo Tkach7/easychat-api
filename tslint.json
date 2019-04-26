@@ -1,10 +1,16 @@
 {
-  "extends": "tslint:recommended",
+  "extends": [
+    "tslint:latest",
+    "tslint-config-prettier"
+  ],
   "rules": {
-    "quotemark": false,
     "member-access": [true, "no-public"],
     "no-console": [true, "log"],
     "trailing-comma": false,
-    "variable-name": [true, "ban-keywords", "check-format", "allow-leading-underscore"]
+    "quotemark": [true, "single", "avoid-escape", "avoid-template"],
+    "variable-name": [true, "ban-keywords", "check-format", "allow-leading-underscore"],
+    "indent": [true, "spaces", 4],
+    "object-literal-sort-keys": false,
+    "ordered-imports": false
   }
 }

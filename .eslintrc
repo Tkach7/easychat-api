@@ -4,8 +4,9 @@
     "plugins": ["@typescript-eslint"],
     "rules": {
         "@typescript-eslint/no-unused-vars": [2, { "argsIgnorePattern": "^_" }],
-        "indent": [2, 4, {"SwitchCase": 1}],
         "no-undef": 0,
-        "no-unused-vars": 0
+        "no-unused-vars": 0,
+        "quotemark": [true, "single", "avoid-escape", "avoid-template"],
+        "singleQuote": true
     }
 }

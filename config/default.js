@@ -1,6 +1,9 @@
 'use strict';
 
 module.exports = {
-    debug: true,
-    port: 3000,
+  db_name: 'easychat',
+  db_port: 28015,
+  debug: true,
+  host: 'localhost',
+  port: 3000
 };
