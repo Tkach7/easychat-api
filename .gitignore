@@ -2,3 +2,7 @@
 /dist
 yarn.lock
 yarn-error.log
+
+.idea
+
+rethinkdb_data

@@ -15,39 +15,28 @@ const server = new http.Server(app);
 const io = new SocketIO(server);
 
 if (config.get('debug')) {
-  app.use(morgan('dev'));
+    app.use(morgan('dev'));
 }
 
-app.use(
-  bodyParser.urlencoded({
-    extended: true
-  })
-);
+app.use(bodyParser.urlencoded({extended: true}));
 
 app.use((err: Error, _req: Request, _res: Response, next: Next) => {
-  console.error(err.stack);
-
-  next();
-});
-
-app.use((err: Error, _req: Request, res: Response) => {
-  console.error(err.stack);
-
-  res.sendStatus(500);
+    console.error(err.stack);
+    next();
 });
 
 const port = config.get('port');
 
 db.connect()
-  .then((conn: Connection) => {
-    server.listen(port, () => {
-      console.info(`Server started on ${port}`);
-      console.info(`Open http://localhost:${port}/`);
+    .then((conn: Connection) => {
+        server.listen(port, () => {
+            console.info(`Server started on ${port}`);
+            console.info(`Open http://localhost:${port}/`);
 
-      io.origins(['http://localhost:63342']); // cors
-      io.on(EventTypes.Connection, connection(conn));
+            io.origins(['http://localhost:5000']); // cors
+            io.on(EventTypes.Connection, connection(conn, io));
+        });
+    })
+    .catch((err: ReqlDriverError) => {
+        console.warn(err);
     });
-  })
-  .catch((err: ReqlDriverError) => {
-    console.warn(err);
-  });
