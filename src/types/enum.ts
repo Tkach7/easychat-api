@@ -3,10 +3,7 @@ export enum EventTypes {
     Disconnect = 'disconnect',
 
     ServerTopicsList = 'server_topic_list',
-    ServerUserEnteredTopic = 'server_user_entered_topic',
     ServerUserId = 'server_user_id',
-    ServerUserLeftTopic = 'server_user_left_topic',
-    ServerUserSendMessage = 'server_user_send_message',
     ServerUpdateTopic = 'server_room_updated',
 
     ClientAddTopic = 'client_add_topic',

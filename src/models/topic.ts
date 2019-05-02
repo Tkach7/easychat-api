@@ -1,7 +1,7 @@
 import rethinkdb, {Connection} from 'rethinkdb';
 import {TableNames} from '../types/enum';
 import {createTable} from '../utils/dbHelper';
-import {Topic} from '../types/interface';
+import {Message, Topic} from '../types/interface';
 
 export const TopicTable = {
     init: (conn: Connection) => createTable(conn, TableNames.Topics),
@@ -30,7 +30,8 @@ export const TopicTable = {
             id,
             name: topicName,
             userOwnerId: userId,
-            usersId: [userId]
+            usersId: [userId],
+            messages: []
         };
         return rethinkdb
             .table(TableNames.Topics)
@@ -61,6 +62,16 @@ export const TopicTable = {
             .update(newTopic)
             .run(conn);
     },
+    addMsg: async (conn: Connection, topicId: string, userId: string, text: string) => {
+        const id = await rethinkdb.uuid().run(conn);
+        const message: Message = {text, topicId, userId, id, createdAt: `${new Date()}`};
+        await rethinkdb
+            .table(TableNames.Topics)
+            .get(topicId)
+            .update({messages: rethinkdb.row('messages').append(message as any)})
+            .run(conn);
+    },
+
     deleteTopic: (conn: Connection, id: string) =>
         rethinkdb
             .table(TableNames.Topics)

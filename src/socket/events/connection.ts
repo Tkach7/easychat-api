@@ -18,6 +18,7 @@ export default (connection: Connection, io: SocketIO.Server) => {
         socket.on(EventTypes.ClientAddTopic, TopicEvents.addTopic.bind(null, connection, io, user.id));
         socket.on(EventTypes.ClientGetTopics, TopicEvents.getTopics.bind(null, connection, socket));
         socket.on(EventTypes.ClientUserEnteredInTopic, TopicEvents.addUser.bind(null, connection, io, socket, user.id));
+        socket.on(EventTypes.ClientUserSendMessage, TopicEvents.addMsg.bind(null, connection, io, user.id));
         socket.on(
             EventTypes.ClientUserLeftTopic,
             TopicEvents.userLeftTopic.bind(null, connection, io, socket, user.id)

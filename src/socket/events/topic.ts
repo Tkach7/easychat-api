@@ -16,6 +16,11 @@ export const TopicEvents = {
         const topics = (await TopicTable.getTopics(conn)) as Topic[];
         io.sockets.emit(EventTypes.ServerTopicsList, {data: topics});
     },
+    addMsg: async (conn: Connection, io: SocketIO.Server, userId: string, {topicId, text}) => {
+        await TopicTable.addMsg(conn, topicId, userId, text);
+        const topic = await TopicTable.getTopicById(conn, topicId);
+        io.sockets.in(`${topic.id}`).emit(EventTypes.ServerUpdateTopic, {data: topic});
+    },
     addUser: async (conn: Connection, io: SocketIO.Server, socket: Socket, userId: string, topicId: string) => {
         socket.join(topicId);
         await TopicTable.addUser(conn, topicId, userId);
