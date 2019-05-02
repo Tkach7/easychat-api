@@ -3,39 +3,38 @@ import {Topic, User} from '../../types/interface';
 import {TopicTable} from '../../models/topic';
 import SocketIO, {Socket} from 'socket.io';
 import {EventTypes} from '../../types/enum';
+import {UserTable} from '../../models/user';
 
 export const TopicEvents = {
-    addTopic: (conn: Connection, io: SocketIO.Server, user: User, topicName: string) => {
-        const topic: Topic = {
-            name: topicName,
-            userOwnerId: user.id,
-            users: [user]
-        };
-        TopicTable.addTopic(conn, topic)
-            .then(() => TopicTable.getTopics(conn))
-            .then((topics: any) => {
-                io.sockets.emit(EventTypes.ServerTopicsList, {data: topics});
-            });
+    getTopics: async (conn: Connection, socket: Socket) => {
+        const topics = await TopicTable.getTopics(conn);
+        socket.emit(EventTypes.ServerTopicsList, {data: topics});
     },
-    addUser: (conn: Connection, io: SocketIO.Server, socket: Socket, user: User, topic: Topic) => {
-        if (topic.users.find((u) => u.id === user.id)) {
+    addTopic: async (conn: Connection, io: SocketIO.Server, user: User, topicName: string) => {
+        const id = await TopicTable.addTopic(conn, user, topicName);
+        await UserTable.updateActiveTopic(conn, user.id, id);
+        const topics = (await TopicTable.getTopics(conn)) as Topic[];
+        io.sockets.emit(EventTypes.ServerTopicsList, {data: topics});
+    },
+    addUser: async (conn: Connection, io: SocketIO.Server, socket: Socket, user: User, topicId: string) => {
+        socket.join(topicId);
+        await TopicTable.addUser(conn, topicId, {...user, activeTopicId: topicId});
+        await UserTable.updateActiveTopic(conn, user.id, topicId);
+        const topic = await TopicTable.getTopicById(conn, topicId);
+        io.sockets.in(`${topic.id}`).emit(EventTypes.ServerUpdateTopic, {data: topic});
+    },
+    userLeftTopic: async (conn: Connection, io: SocketIO.Server, socket: Socket, userId: string, topicId: string) => {
+        const topic = await TopicTable.getTopicById(conn, topicId);
+        await UserTable.updateActiveTopic(conn, userId, null);
+        if (topic.users.length === 1) {
+            await TopicTable.deleteTopic(conn, topicId);
+            const topics = await TopicTable.getTopics(conn);
+            socket.emit(EventTypes.ServerTopicsList, {data: topics});
             return;
         }
-        socket.join(`${topic.id}`);
-        TopicTable.addUser(conn, topic, user).then(() => {
-            topic.users.push(user);
-            io.sockets.in(`${topic.id}`).emit(EventTypes.ServerUpdateTopic, {data: topic});
-        });
-    },
-    removeUser: (conn: Connection, io: SocketIO.Server, socket: Socket, user: User, topic: Topic) => {
-        TopicTable.removeUser(conn, topic, user).then((t: any) => {
-            if (t.removed) {
-                TopicTable.getTopics(conn).then((topics) => {
-                    socket.emit(EventTypes.ServerTopicsList, {data: topics});
-                });
-                return;
-            }
-            io.sockets.in(`${t.id}`).emit(EventTypes.ServerUpdateTopic, {data: t});
-        });
+        await TopicTable.removeUser(conn, topicId, userId);
+        io.sockets
+            .in(topicId)
+            .emit(EventTypes.ServerUpdateTopic, {data: {...topic, users: topic.users.filter((u) => u.id !== userId)}});
     }
 };

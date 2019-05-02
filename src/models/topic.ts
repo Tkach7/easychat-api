@@ -5,6 +5,11 @@ import {Topic, User} from '../types/interface';
 
 export const TopicTable = {
     init: (conn: Connection) => createTable(conn, TableNames.Topics),
+    getTopicById: (conn: Connection, topicId: string): Promise<Topic> =>
+        rethinkdb
+            .table(TableNames.Topics)
+            .get(topicId)
+            .run(conn) as Promise<Topic>,
     getTopics: (conn: Connection) =>
         new Promise((resolve, reject) => {
             rethinkdb.table(TableNames.Topics).run(conn, (error, cursor) => {
@@ -19,36 +24,36 @@ export const TopicTable = {
                 });
             });
         }),
-    addTopic: async (conn: Connection, topic: Topic) => {
-        topic.id = await rethinkdb.uuid().run(conn);
+    addTopic: async (conn: Connection, user: User, topicName: string): Promise<string> => {
+        const id = await rethinkdb.uuid().run(conn);
+        const topic: Topic = {
+            id,
+            name: topicName,
+            userOwnerId: user.id,
+            users: [{...user, activeTopicId: id}]
+        };
         return rethinkdb
             .table(TableNames.Topics)
             .insert(topic)
-            .run(conn);
+            .run(conn)
+            .then(() => id);
     },
-    addUser: (
-        conn: Connection,
-        topic: Topic,
-        user: any // todo: type
-    ) =>
+    addUser: (conn: Connection, topicId: string, user: User) =>
         rethinkdb
             .table(TableNames.Topics)
-            .get(`${topic.id}`)
-            .update({users: rethinkdb.row('users').append(user)})
+            .get(topicId)
+            .update({users: rethinkdb.row('users').append(user as any)})
             .run(conn),
-    removeUser: async (conn: Connection, topic: Topic, user: User) => {
+    removeUser: async (conn: Connection, topicId: string, userId: string) => {
         const newTopic = (await rethinkdb
             .table(TableNames.Topics)
-            .get(`${topic.id}`)
+            .get(topicId)
             .run(conn)) as Topic;
-        newTopic.users = newTopic.users.filter((u) => u.id !== user.id);
-        if (!newTopic.users.length) {
-            return TopicTable.deleteTopic(conn, topic.id);
-        }
+        newTopic.users = newTopic.users.filter((u) => u.id !== userId);
         return rethinkdb
             .table(TableNames.Topics)
-            .get(`${topic.id}`)
-            .update(newTopic, {returnChanges: true})
+            .get(topicId)
+            .update(newTopic)
             .run(conn);
     },
     deleteTopic: (conn: Connection, id: string) =>
@@ -57,5 +62,4 @@ export const TopicTable = {
             .get(id)
             .delete()
             .run(conn)
-            .then(() => ({removed: true}))
 };

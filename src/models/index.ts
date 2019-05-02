@@ -1,6 +1,6 @@
 import config from 'config';
 import rethinkdb, {Connection, ReqlDriverError} from 'rethinkdb';
-import {USER_TABLE} from './user';
+import {UserTable} from './user';
 import {TopicTable} from './topic';
 
 export const db = {
@@ -14,7 +14,7 @@ export const db = {
                         return;
                     }
                     db.createDb(conn);
-                    Promise.all([USER_TABLE.init(conn), TopicTable.init(conn)]).then(() => resolve(conn));
+                    Promise.all([UserTable.init(conn), TopicTable.init(conn)]).then(() => resolve(conn));
                 }
             );
         }),
