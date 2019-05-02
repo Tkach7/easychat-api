@@ -23,10 +23,10 @@ export const UserTable = {
             .insert(user)
             .run(conn)
             .then(() => socket.emit(EventTypes.ServerUserId, user.id)),
-    removeUser: (conn: Connection, user: User) =>
+    removeUser: (conn: Connection, userId: string) =>
         rethinkdb
             .table(TableNames.Users)
-            .get(user.id)
+            .get(userId)
             .delete()
             .run(conn)
 };
