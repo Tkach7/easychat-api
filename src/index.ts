@@ -11,8 +11,9 @@ import {db} from './models';
 
 const app = express();
 const server = new http.Server(app);
-// @ts-ignore
-const io = new SocketIO(server);
+
+const socket = SocketIO as any;
+const io = new socket(server);
 
 if (config.get('debug')) {
     app.use(morgan('dev'));
