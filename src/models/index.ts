@@ -7,7 +7,7 @@ export const db = {
     connect: () =>
         new Promise<Connection>((resolve, reject) => {
             rethinkdb.connect(
-                {host: config.get('host'), port: config.get('db_port'), db: config.get('db_name')},
+                {host: config.get('host'), port: config.get('dbPort'), db: config.get('dbName')},
                 (error: ReqlDriverError, conn: Connection) => {
                     if (error) {
                         reject(error);
@@ -20,12 +20,12 @@ export const db = {
         }),
     createDb: (conn: Connection) => {
         (rethinkdb.dbList() as any)
-            .contains(config.get('db_name'))
+            .contains(config.get('dbName'))
             .do((databaseExists: any) =>
                 rethinkdb.branch(
                     databaseExists,
                     {dbs_created: 0} as any,
-                    rethinkdb.dbCreate(config.get('db_name')) as any
+                    rethinkdb.dbCreate(config.get('dbName')) as any
                 )
             )
             .run(conn);

@@ -47,7 +47,7 @@ export const TopicTable = {
         rethinkdb
             .table(TableNames.Topics)
             .get(topicId)
-            .update({users: rethinkdb.row('users').append(userId)})
+            .update({usersId: rethinkdb.row('usersId').append(userId)})
             .run(conn);
     },
     removeUser: async (conn: Connection, topicId: string, userId: string) => {
