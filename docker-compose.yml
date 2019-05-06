@@ -1,13 +1,17 @@
-version: "2"
+version: "3"
 services:
-  app:
-    container_name: app
-    restart: always
-    build: .
+  base:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: easychat-api
+    container_name: easychat-api
+    command: npm start
     ports:
       - 3000:3000
-    links:
+    depends_on:
       - rethinkdb
+
   rethinkdb:
     container_name: rethinkdb
     image: rethinkdb
@@ -17,3 +21,5 @@ services:
       - 8080:8080
       - 28015:28015
       - 29015:29015
+
+

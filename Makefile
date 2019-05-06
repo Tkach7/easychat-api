@@ -10,6 +10,18 @@ down:
 logs:
 		docker-compose logs -f -t
 
+build:
+		docker-compose build
+
+stop-containers:
+		docker kill $(docker ps -q)
+
+remove-containers:
+		docker rm $(docker ps -a -q)
+
+remove-images:
+		docker rmi $(docker images -q) --force
+
 # Production
 prod:
 		docker-compose -f docker-compose.prod.yml up -d

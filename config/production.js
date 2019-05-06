@@ -1,6 +1,10 @@
 'use strict';
 
 module.exports = {
-  debug: false,
-  port: process.env.PORT
+    authKey: '',
+    dbName: 'easychat',
+    dbPort: 28015,
+    debug: false,
+    host: 'rethinkdb',
+    port: process.env.PORT
 };
