@@ -19,8 +19,6 @@ if (config.get('debug')) {
     app.use(morgan('dev'));
 }
 
-app.use(bodyParser.urlencoded({extended: true}));
-
 app.use((err: Error, _req: Request, _res: Response, next: Next) => {
     console.error(err.stack);
     next();
