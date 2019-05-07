@@ -1,5 +1,4 @@
 'use strict';
-
 module.exports = {
     dbName: 'easychat',
     dbPort: process.env.DB_PORT,

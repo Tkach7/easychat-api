@@ -8,7 +8,7 @@ export const db = {
         new Promise<Connection>((resolve, reject) => {
             rethinkdb.connect(
                 {
-                    host: '54.146.135.137',
+                    host: config.get('host'),
                     port: config.get('dbPort'),
                     db: config.get('dbName'),
                     user: config.get('user'),

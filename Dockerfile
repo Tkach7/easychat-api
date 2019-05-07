@@ -1,10 +1,24 @@
+# В качестве базового образа используем образ с Node.js 10
 FROM node:10
 LABEL maintainer="Daniil Tkach <dan7tkach@gmail.com>"
-WORKDIR /easychat-api
-COPY package*.json ./
+
+# Копируем файлы необходимые для работы приложения
+COPY config /config
+COPY dist /dist
+COPY package.json /
+COPY package-lock.json /
+
+# Устанавливаем зависимости
 RUN npm run deps:production
-COPY . ./
+
+# Указываем production окружение для приложения
+# Благодаря ему мы применим конфигурацию из configs/production.ts
 ENV NODE_ENV production
-RUN npm run build
-ENV PORT 3000
-EXPOSE 3000
+
+# Сообщаем, что контейнер готов принимать запросы по 80 порту
+# Нужно для локального запуска контейнера, Heroku проигнорирует
+ENV PORT 80
+EXPOSE 80
+
+# Запускаем сервис при старте контейнера
+CMD npm start
