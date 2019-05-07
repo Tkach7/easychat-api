@@ -7,7 +7,13 @@ export const db = {
     connect: () =>
         new Promise<Connection>((resolve, reject) => {
             rethinkdb.connect(
-                {host: config.get('host'), port: config.get('dbPort'), db: config.get('dbName')},
+                {
+                    host: '54.146.135.137',
+                    port: config.get('dbPort'),
+                    db: config.get('dbName'),
+                    user: config.get('user'),
+                    password: config.get('password')
+                },
                 (error: ReqlDriverError, conn: Connection) => {
                     if (error) {
                         reject(error);

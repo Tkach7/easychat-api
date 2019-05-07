@@ -1,4 +1,3 @@
-import bodyParser from 'body-parser';
 import config from 'config';
 import express, {NextFunction as Next, Request, Response} from 'express';
 import http from 'http';
