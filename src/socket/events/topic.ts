@@ -32,10 +32,14 @@ export const TopicEvents = {
         const topic = await TopicTable.getTopicById(conn, topicId);
         await UserTable.updateActiveTopic(conn, userId, null);
         if (topic.usersId.length === 1) {
-            await TopicTable.deleteTopic(conn, topicId);
-            const topics = await TopicTable.getTopics(conn);
-            socket.emit(EventTypes.ServerTopicsList, {data: topics});
-            return;
+            setTimeout(async () => {
+                const newTopic = await TopicTable.getTopicById(conn, topicId);
+                if (newTopic.usersId.length === 1) {
+                    await TopicTable.deleteTopic(conn, topicId);
+                    const topics = await TopicTable.getTopics(conn);
+                    socket.emit(EventTypes.ServerTopicsList, {data: topics});
+                }
+            }, 30000);
         }
         await TopicTable.removeUser(conn, topicId, userId);
         io.sockets.in(topicId).emit(EventTypes.ServerUpdateTopic, {
