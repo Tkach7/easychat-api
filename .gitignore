@@ -6,3 +6,5 @@ yarn-error.log
 .idea
 
 rethinkdb_data
+tkachspamyadnexru.pem
+.env
